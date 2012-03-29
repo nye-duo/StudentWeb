@@ -22,6 +22,10 @@
     </build>
 
     <dependencies>
-        
+        <dependency>
+			<groupId>org.swordapp</groupId>
+			<artifactId>sword2-client</artifactId>
+			<version>0.9</version>
+        </dependency>
     </dependencies>
 </project>
