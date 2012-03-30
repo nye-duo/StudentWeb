@@ -1,0 +1,124 @@
+StudentWeb Sword Integration Tools
+==================================
+
+Introduction
+------------
+
+This library contans a variety of tools to aid the integration between StudentWeb
+and DSpace via SWORD.
+
+
+Build/Install
+-------------
+
+This library depends on the sword2-client 0.9 Java Library which is not currently available
+in the Maven central repo.  It can be downloaded from:
+
+	http://sourceforge.net/projects/sword-app/files/SWORDv2%20Java%20Client/
+
+Once downloaded it should be compiled with:
+
+	mvn clean package
+
+and then installed into the local maven repository with
+
+	mvn install
+
+Once this is done, then it's possible to compile this library with "mvn clean package" too.
+
+
+Endpoint Discovery
+------------------
+
+###Introduction
+
+The Endpoint Discovery features implement the business logic as laid out in the
+integration requirements, and diagrammed here:
+
+	https://docs.google.com/a/cottagelabs.com/file/d/0B8W3CmDjW93kM3lZUGNIMGJSektXeXZBSGZpTHM1UQ/edit
+
+It also contains features to carry out the following specific tasks:
+
+1/ Interpret url templates for service document urls
+
+2/ Make requests to a sword server to retrieve the service document, and validate the supplied
+	deposit url against it.
+
+
+###Url Templates
+
+If the Service Document url is not available in full, it may instead be provided as a
+URL template which encloses keywords to be replaced in curly braces, thus:
+
+	{unit-code}
+
+During discovery these urls will be parsed into the correct form for use in retrieving
+the service document from the sword server.  For example:
+
+	http://duo.oui.no/swordv2/service/{unit-code}
+
+might become:
+
+	http://duo.oui.no/swordv2/service/12345
+
+The list of keywords which can be replaced is dependent on the implementation of the
+TemplateUrlSourceData interface, which must be provided by the module user (i.e. you).
+
+
+###Sword Collections
+
+When a discovery operation is run, the module may respond with one of two things:
+
+1/	A list with only one SWORDCollection object, which represents the supplied deposit
+	url.  This happens if the deposit url is successfully validated against the
+	retrieved service document.
+
+2/	A list with an arbitrary number (zero or more) SWORDCollection objects which represent
+	the available collections for deposit.  This happens if the supplied deposit url
+	is either null or unsuccessful in validating against the retrieved service document
+
+Either way, the caller will receive a List<SWORDCollection> object which can then be
+used to select the deposit endpoint.  If the list is of size 1, then the deposit should
+go ahead without bothering the user about selection, and if it is greater than size 1,
+then the user should be offered the choice of deposit.
+
+The list of collections returned will be obtained from the sword server using the
+AuthCredentials object supplied to the EndpointDiscovery class, and so all returned
+collections are safe for deposit by the authenticated user.
+
+###Example Usage
+
+	EndpointDiscovery ed = new EndpointDiscovery(
+				"http://duo.uio.no/swordv2/service", // service document url
+				"http://duo.uio.no/swordv2/service/{unit-code}",	// or service document template
+				"http://duo.uio.no/swordv2/collection/1",	// desired deposit endpoint
+				new SWTemplateUrlSourceData(), 		// implementation of the TemplateUrlSourceData interface
+				new AuthCredentials("sword", "sword")	// sword server credentials
+		);
+
+	// retrieve the list of possible collections
+	List<SWORDCollection> cols = ed.getEndpoints();
+
+	if (cols.size() == 0)
+	{
+		// no deposit collections available - you probably
+		// want to give the client an error
+	}
+	else if (cols.size() == 1)
+	{
+		// only one available collection, so go ahead and do the
+		// deposit
+	}
+	else
+	{
+		// more than one collection available, so give the user
+		// a selection
+	}
+
+###Known Limitations
+
+SWORDv2 permits service documents to be nested.  The EndpointDiscovery library only looks
+at the top level service documents, and does not attempt to validate supplied
+deposit urls against sub-service documents.  Therefore, if possible configure your
+sword server to give all the collections in one service document and do not
+use nested service documents.
