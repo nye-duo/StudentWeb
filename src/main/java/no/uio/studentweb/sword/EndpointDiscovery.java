@@ -110,6 +110,11 @@ public class EndpointDiscovery
 			SWORDClient client = new SWORDClient();
 			ServiceDocument sd = client.getServiceDocument(this.instituteServiceDocument, this.swordAuth);
 
+			if (sd == null)
+			{
+				throw new NoServiceException("The sword server did not respond with a service document");
+			}
+
 			for (SWORDWorkspace workspace : sd.getWorkspaces())
 			{
 				// store all the collections in one big array
@@ -158,7 +163,11 @@ public class EndpointDiscovery
 			int b = t.indexOf("}", a + 1);
 			if (b == -1) { break; }
 			String key = t.substring(a + 1, b);
-			String substitute = this.templateUrlSourceData.getTemplateProperty(key);
+			String substitute = "";
+			if (!"".equals(key))
+			{
+				substitute = this.templateUrlSourceData.getTemplateProperty(key);
+			}
 			t = t.substring(0, a) + substitute + t.substring(b + 1);
 		}
 
