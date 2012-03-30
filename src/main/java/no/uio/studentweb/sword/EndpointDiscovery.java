@@ -1,3 +1,31 @@
+/*
+	Copyright (c) 2012, University of Oslo
+
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+		* Redistributions of source code must retain the above copyright
+		  notice, this list of conditions and the following disclaimer.
+		* Redistributions in binary form must reproduce the above copyright
+		  notice, this list of conditions and the following disclaimer in the
+		  documentation and/or other materials provided with the distribution.
+		* Neither the name of the University of Oslo nor the
+		  names of its contributors may be used to endorse or promote products
+		  derived from this software without specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE UNIVERSITY OF OSLO BE LIABLE FOR ANY
+	DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package no.uio.studentweb.sword;
 
 import org.swordapp.client.AuthCredentials;
@@ -11,16 +39,48 @@ import org.swordapp.client.ServiceDocument;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main class for carrying out EndpointDiscovery operations
+ *
+ * The class should be constructed with all the relevant known information (see Constructor
+ * documentation), and then getEndpoints() can be called.
+ *
+ * This class uses the SWORDClient
+ */
 public class EndpointDiscovery
 {
+	/** The service document associated with the institute */
 	private String instituteServiceDocument = null;
+
+	/** The service document template associated with the institute */
 	private String instituteServiceDocumentTemplate = null;
+
+	/** The deposit url for the study program */
 	private String studyProgramDeposit = null;
+
+	/** An instance of a class which implements the TemplateUrlSourceData interface */
 	private TemplateUrlSourceData templateUrlSourceData = null;
+
+	/** The SWORD Client's AuthCredentials object */
 	private AuthCredentials swordAuth = null;
 
+	/**
+	 * Construct a blank EndpointDiscovery object.  This will be of no use
+	 * directly, so use the getters and setters to populate as you require
+	 */
 	public EndpointDiscovery() { }
 
+	/**
+	 * Construct an EndpointDiscovery with all of its available parameters.  Nulls may be passed
+	 * in, or use the blank constructor and getters and setters if you require a sub-set of the
+	 * total allowed argument set
+	 *
+	 * @param instituteServiceDocument	The service document associated with the institute
+	 * @param instituteServiceDocumentTemplate	The service document template associated with the institute
+	 * @param studyProgramDeposit	The deposit url for the study program
+	 * @param templateUrlSourceData		An instance of a class which implements the TemplateUrlSourceData interface
+	 * @param swordAuth		The SWORD Client's AuthCredentials object
+	 */
 	public EndpointDiscovery(String instituteServiceDocument, String instituteServiceDocumentTemplate,
 							 String studyProgramDeposit, TemplateUrlSourceData templateUrlSourceData,
 							 AuthCredentials swordAuth)
@@ -82,6 +142,29 @@ public class EndpointDiscovery
 		this.swordAuth = swordAuth;
 	}
 
+	/**
+	 * Get a list of SWORDCollection objects representing the available endpoints for the
+	 * configuration of the current EndpointDiscovery object.
+	 *
+	 * This will return one of two sets of things:
+	 *
+	 * 1/	A list with only one SWORDCollection object, which represents the studyProgramDeposit
+	 * 		url member variable.  This happens if the studyProgramDeposit member variable is
+	 * 		successfully validated against the retrieved service document.
+	 *
+	 * 2/	A list with an arbitrary number (zero or more) SWORDCollection objects which represent
+	 * 		the available collections for deposit.  This happens if the studyProgramDeposit member
+	 * 		variable is either null or unsuccessful in validating against the retrieved service document
+	 *
+	 * FIXME: this currently only deals with flat service documents - hierarchical service documents are
+	 * 		not supported
+	 *
+	 * @return	A list of zero or more SWORDCollection objects
+	 * @throws NoServiceException	if the service document url cannot be obtained, or the service document itself cannot be resolved
+	 * @throws DiscoveryConfigurationException		if the member variables of the object are insufficient to carry out the endpoint discovery
+	 * @throws SWORDClientException		re-throws exceptions from the SWORDClient
+	 * @throws TemplateUrlPropertyException		if the instituteServiceDocumentTemplate contains fields which the source data cannot interpret
+	 */
 	public List<SWORDCollection> getEndpoints()
 			throws NoServiceException, DiscoveryConfigurationException, SWORDClientException, TemplateUrlPropertyException
 	{
@@ -141,6 +224,18 @@ public class EndpointDiscovery
 		return allCollections;
 	}
 
+	/**
+	 * Generate the service document url from the instituteServiceDocumentTemplate member variable
+	 *
+	 * This takes URLs which have replaceable elements wrapped by { and }, such as
+	 * "http://some.url.com/{unit-code}", and looks up the replaceable elements in the
+	 * TemplateUrlSourceData implementation held as a member variable.  All such templated
+	 * fields are interpreted and the URL returned.
+	 *
+	 * @return	the interpreted/replaced url
+	 * @throws DiscoveryConfigurationException	if the member variables of the object are insufficient to carry out the endpoint discovery
+	 * @throws TemplateUrlPropertyException	if the instituteServiceDocumentTemplate contains fields which the source data cannot interpret
+	 */
 	private String generateServiceDocumentUrl()
 			throws DiscoveryConfigurationException, TemplateUrlPropertyException
 	{
@@ -161,7 +256,10 @@ public class EndpointDiscovery
 			int a = t.indexOf("{");
 			if (a == -1) { break; }
 			int b = t.indexOf("}", a + 1);
-			if (b == -1) { break; }
+			if (b == -1)
+			{
+				throw new TemplateUrlPropertyException("Opening { detected, but no equivalent closing brace");
+			}
 			String key = t.substring(a + 1, b);
 			String substitute = "";
 			if (!"".equals(key))
