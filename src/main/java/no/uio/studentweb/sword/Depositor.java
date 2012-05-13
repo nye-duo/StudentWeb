@@ -38,29 +38,29 @@ import org.swordapp.client.SWORDClientException;
 import org.swordapp.client.SWORDError;
 import org.swordapp.client.SwordResponse;
 
+import no.uio.duo.bagit.BagIt;
+
 import javax.xml.namespace.QName;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Depositor
 {
-	// FIXME: the real API will take the parameters required to create
-	// the BagIt, or the actual BagIt object, which we haven't seen the
-	// specification of yet
-	public DepositReceipt create(String colUri, AuthCredentials auth, Object bagIt)
-			throws SWORDClientException, SWORDError
+	public DepositReceipt create(String colUri, AuthCredentials auth, BagIt bagIt)
+			throws SWORDClientException, SWORDError, IOException
 	{
 		SWORDClient client = new SWORDClient();
 
 		Deposit deposit = new Deposit();
 		deposit.setInProgress(true);
-		/*
-		deposit.setFile(bagIt.getFile()); // FIXME
-		deposit.setFilename(bagIt.getName()); // FIXME
-		deposit.setMd5(bagIt.getMD5()); // FIXME
-		deposit.setMimeType(bagIt.getMimetype()); // FIXME
-		deposit.setPackaging(bagIt.getPackaging()); // FIXME
-		*/
+
+		deposit.setFile(bagIt.getFile());
+		deposit.setFilename(bagIt.getName());
+		deposit.setMd5(bagIt.getMD5());
+		deposit.setMimeType(bagIt.getMimetype());
+		deposit.setPackaging(bagIt.getPackaging());
+
 		try
 		{
 			DepositReceipt receipt = client.deposit(colUri, deposit, auth);
@@ -72,11 +72,8 @@ public class Depositor
 		}
 	}
 
-	// FIXME: the real API will take the parameters required to create
-	// the BagIt, or the actual BagIt object, which we haven't seen the
-	// specification of yet
-	public SwordResponse update(String editUri, AuthCredentials auth, Object bagIt)
-			throws SWORDClientException, SWORDError
+	public SwordResponse update(String editUri, AuthCredentials auth, BagIt bagIt)
+			throws SWORDClientException, SWORDError, IOException
 	{
 		try
 		{
@@ -85,13 +82,12 @@ public class Depositor
 
 			Deposit deposit = new Deposit();
 			deposit.setMetadataRelevant(true);
-			/*
-			deposit.setFile(bagIt.getFile()); // FIXME
-			deposit.setFilename(bagIt.getName()); // FIXME
-			deposit.setMd5(bagIt.getMD5()); // FIXME
-			deposit.setMimeType(bagIt.getMimetype()); // FIXME
-			deposit.setPackaging(bagIt.getPackaging()); // FIXME
-			*/
+
+			deposit.setFile(bagIt.getFile());
+			deposit.setFilename(bagIt.getName());
+			deposit.setMd5(bagIt.getMD5());
+			deposit.setMimeType(bagIt.getMimetype());
+			deposit.setPackaging(bagIt.getPackaging());
 			
 			SwordResponse resp = client.replaceMedia(receipt, deposit, auth);
 			return resp;
