@@ -31,6 +31,7 @@ public class Constants
 {
 	public static String FS_NS = "http://studentweb.no/terms/";
 
+    public static String FS_METADATA = "metadata";
 	public static String FS_GRADE = "grade";
 	public static String FS_EMBARGO_END_DATE = "embargoEndDate";
 	public static String FS_EMBARGO_TYPE = "embargoType";
