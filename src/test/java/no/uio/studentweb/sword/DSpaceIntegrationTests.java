@@ -8,6 +8,7 @@ import org.swordapp.client.SWORDCollection;
 import org.swordapp.client.SwordResponse;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 public class DSpaceIntegrationTests
@@ -207,7 +208,7 @@ public class DSpaceIntegrationTests
     }
 
     @Test
-    public void setGrade()
+    public void setGradeWithPermanentEmbargo()
             throws Exception
     {
         // first create an item to add the grade to
@@ -259,7 +260,119 @@ public class DSpaceIntegrationTests
 
         // now set the grade
 
-        SwordResponse response = depositor.setGrade(receipt.getLocation(), new AuthCredentials("test", "test"), "pass");
+        SwordResponse response = depositor.setGradeWithPermanentEmbargo(receipt.getLocation(), new AuthCredentials("test", "test"), "pass");
+    }
+
+    @Test
+    public void setGrade()
+            throws Exception
+    {
+        // first create an item to add the grade to
+
+        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        String fileBase = "/home/richard/Code/External/BagItLibrary/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+
+        BagIt bi = new BagIt(out);
+
+        bi.addFinalFile(new File(firstFinal), 1);
+        bi.addFinalFile(new File(secondFinal), 2);
+        bi.addFinalFile(new File(thirdFinal), 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        Depositor depositor = new Depositor();
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        System.out.println(receipt.getLocation());
+
+        out.delete();
+
+        // now set the grade with a near embargo
+        Date embargo = new Date((new Date()).getTime() + 1000000000L);
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), new AuthCredentials("test", "test"), "pass", embargo, "a while");
+    }
+
+    @Test
+    public void setEmbargo()
+            throws Exception
+    {
+        // first create an item forfeit the appeal for
+
+        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        String fileBase = "/home/richard/Code/External/BagItLibrary/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+        
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+
+        BagIt bi = new BagIt(out);
+
+        bi.addFinalFile(new File(firstFinal), 1);
+        bi.addFinalFile(new File(secondFinal), 2);
+        bi.addFinalFile(new File(thirdFinal), 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        Depositor depositor = new Depositor();
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        System.out.println(receipt.getLocation());
+
+        out.delete();
+
+        // now set the grade with a near embargo
+        Date embargo = new Date((new Date()).getTime() + 1000000000L);
+        SwordResponse response = depositor.setEmbargo(receipt.getLocation(),  new AuthCredentials("test", "test"), embargo, "embargo");
     }
 
     @Test
@@ -313,9 +426,9 @@ public class DSpaceIntegrationTests
 
         out.delete();
 
-        // now set the grade
-
-        SwordResponse response = depositor.setGrade(receipt.getLocation(), new AuthCredentials("test", "test"), "fail");
+        // now set the grade with a near embargo
+        Date embargo = new Date((new Date()).getTime() + 1000000000L);
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), new AuthCredentials("test", "test"), "fail", embargo, "a while");
 
         // now forfeit the appeal process
 

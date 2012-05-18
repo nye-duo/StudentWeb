@@ -34,4 +34,6 @@ public class Constants
 	public static String FS_GRADE = "grade";
 	public static String FS_EMBARGO_END_DATE = "embargoEndDate";
 	public static String FS_EMBARGO_TYPE = "embargoType";
+
+    public static String EMBARGO_PERMANENT = "permanent";
 }

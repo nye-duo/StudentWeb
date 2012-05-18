@@ -113,7 +113,15 @@ public class Depositor
 		}
 	}
 
-	public SwordResponse setGrade(String editUri, AuthCredentials auth, String grade)
+    public SwordResponse setGradeWithPermanentEmbargo(String editUri, AuthCredentials auth, String grade)
+            throws SWORDClientException, SWORDError
+    {
+        // give us a date a couple of hundred years in the future
+        Date embargoUntil = new Date((new Date()).getTime() + 9000000000000L);
+        return this.setGrade(editUri, auth, grade, embargoUntil, Constants.EMBARGO_PERMANENT);
+    }
+
+	public SwordResponse setGrade(String editUri, AuthCredentials auth, String grade, Date embargoUntil, String embargoType)
 			throws SWORDClientException, SWORDError
 	{
 		try
@@ -122,6 +130,8 @@ public class Depositor
 
 			EntryPart ep = new EntryPart();
 			ep.addSimpleExtension(new QName(Constants.FS_NS, Constants.FS_GRADE), grade);
+
+            this.addEmbargoDetails(ep, embargoUntil, embargoType);
 
 			Deposit deposit = new Deposit();
 			deposit.setEntryPart(ep);
@@ -139,33 +149,44 @@ public class Depositor
 	public SwordResponse forfeitGradeAppeal(String editUri, AuthCredentials auth, Date embargoUntil, String embargoType)
 			throws SWORDClientException, SWORDError
 	{
-		try
-		{
-			SWORDClient client = new SWORDClient();
-			EntryPart ep = new EntryPart();
-			Deposit deposit = new Deposit();
-
-			if (embargoUntil != null)
-			{
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-				String eed = sdf.format(embargoUntil);
-				ep.addSimpleExtension(new QName(Constants.FS_NS, Constants.FS_EMBARGO_END_DATE), eed);
-			}
-
-			if (embargoType != null)
-			{
-				ep.addSimpleExtension(new QName(Constants.FS_NS, Constants.FS_EMBARGO_TYPE), embargoType);
-			}
-
-			deposit.setEntryPart(ep);
-			deposit.setInProgress(false);
-
-			DepositReceipt receipt = client.addToContainer(editUri, deposit, auth);
-			return receipt;
-		}
-		catch (ProtocolViolationException e)
-		{
-			throw new SWORDClientException(e);
-		}
+		return this.setEmbargo(editUri, auth, embargoUntil, embargoType);
 	}
+
+    public SwordResponse setEmbargo(String editUri, AuthCredentials auth, Date embargoUntil, String embargoType)
+    			throws SWORDClientException, SWORDError
+    {
+        try
+        {
+            SWORDClient client = new SWORDClient();
+            EntryPart ep = new EntryPart();
+            Deposit deposit = new Deposit();
+
+            this.addEmbargoDetails(ep, embargoUntil, embargoType);
+
+            deposit.setEntryPart(ep);
+            deposit.setInProgress(false);
+
+            DepositReceipt receipt = client.addToContainer(editUri, deposit, auth);
+            return receipt;
+        }
+        catch (ProtocolViolationException e)
+        {
+            throw new SWORDClientException(e);
+        }
+    }
+
+    private void addEmbargoDetails(EntryPart ep, Date embargoUntil, String embargoType)
+    {
+        if (embargoUntil != null)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String eed = sdf.format(embargoUntil);
+            ep.addSimpleExtension(new QName(Constants.FS_NS, Constants.FS_EMBARGO_END_DATE), eed);
+        }
+
+        if (embargoType != null)
+        {
+            ep.addSimpleExtension(new QName(Constants.FS_NS, Constants.FS_EMBARGO_TYPE), embargoType);
+        }
+    }
 }
