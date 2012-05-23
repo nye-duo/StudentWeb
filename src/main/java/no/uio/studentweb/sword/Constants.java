@@ -36,5 +36,11 @@ public class Constants
 	public static String FS_EMBARGO_END_DATE = "embargoEndDate";
 	public static String FS_EMBARGO_TYPE = "embargoType";
 
-    public static String EMBARGO_PERMANENT = "permanent";
+    public static String EMBARGO_PERMANENT = "restricted";
+    public static String EMBARGO_OPEN = "open";
+    public static String EMBARGO_3_YEARS = "3 years";
+    public static String EMBARGO_CLOSED = "closed";
+
+    public static String PASS = "pass";
+    public static String FAIL = "fail";
 }

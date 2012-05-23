@@ -117,7 +117,7 @@ public class Depositor
             throws SWORDClientException, SWORDError
     {
         // give us a date a couple of hundred years in the future
-        Date embargoUntil = new Date((new Date()).getTime() + 9000000000000L);
+        Date embargoUntil = this.getFarFuture();
         return this.setGrade(editUri, auth, grade, embargoUntil, Constants.EMBARGO_PERMANENT);
     }
 
@@ -146,11 +146,31 @@ public class Depositor
 		}
 	}
 
+    public SwordResponse forfeitGradeAppeal(String editUri, AuthCredentials auth, String grade, Date embargoUntil, String embargoType)
+            throws SWORDClientException, SWORDError
+    {
+        return this.setGrade(editUri, auth, grade, embargoUntil, embargoType);
+    }
+
 	public SwordResponse forfeitGradeAppeal(String editUri, AuthCredentials auth, Date embargoUntil, String embargoType)
 			throws SWORDClientException, SWORDError
 	{
 		return this.setEmbargo(editUri, auth, embargoUntil, embargoType);
 	}
+
+    public SwordResponse forfeitGradeAppealWithPermanentEmbargo(String editUri, AuthCredentials auth, String grade)
+            throws SWORDClientException, SWORDError
+    {
+        return this.setGradeWithPermanentEmbargo(editUri, auth, grade);
+    }
+
+    public SwordResponse forfeitGradeAppealWithPermanentEmbargo(String editUri, AuthCredentials auth)
+            throws SWORDClientException, SWORDError
+    {
+        // give us a date a couple of hundred years in the future
+        Date embargoUntil = this.getFarFuture();
+        return this.setEmbargo(editUri, auth, embargoUntil, Constants.EMBARGO_PERMANENT);
+    }
 
     public SwordResponse setEmbargo(String editUri, AuthCredentials auth, Date embargoUntil, String embargoType)
     			throws SWORDClientException, SWORDError
@@ -188,5 +208,11 @@ public class Depositor
         {
             ep.addSimpleExtension(new QName(Constants.FS_NS, Constants.FS_EMBARGO_TYPE), embargoType);
         }
+    }
+
+    private Date getFarFuture()
+    {
+        Date future = new Date((new Date()).getTime() + 9000000000000L);
+        return future;
     }
 }
