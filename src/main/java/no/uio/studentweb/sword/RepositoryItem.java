@@ -44,6 +44,7 @@ import org.swordapp.client.Statement;
 import org.swordapp.client.StatementParseException;
 
 import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
@@ -127,9 +128,12 @@ public class RepositoryItem
             StringWriter writer = new StringWriter();
             metadataElement.writeTo(writer);
 
+            // bunch of back-flips to make this actually work ...
             Builder parser = new Builder();
-            Document doc = parser.build(writer.toString());
-            Metadata metadata = new Metadata(doc.getRootElement());
+            Document doc = parser.build(new ByteArrayInputStream(writer.toString().getBytes()));
+            nu.xom.Element root = doc.getRootElement();
+            nu.xom.Element clone = (nu.xom.Element) root.copy();
+            Metadata metadata = new Metadata(clone);
 
             return metadata;
         }
