@@ -11,20 +11,32 @@ and DSpace (DUO) via SWORD.
 Build/Install
 -------------
 
+###SWORDv2 Client
+
 This library depends on the sword2-client 0.9 Java Library which is not currently available
 in the Maven central repo.  It can be downloaded from:
 
 	https://github.com/swordapp/JavaClient2.0
 
-Once downloaded it should be compiled with:
-
-	mvn clean package
-
-and then installed into the local maven repository with
+Once downloaded it should be installed into the local maven repository with
 
 	mvn install
 
-Once this is done, then it's possible to compile this library with:
+###BagItLibrary
+
+This library depends on the 1.0 version of the BagItLibrary which implements the custom packaging and unpackaging
+requirements for StudentWeb and Duo.  It can be downloaded from:
+
+https://github.com/nye-duo/BagItLibrary
+
+You should follow the Build/Install instructions provided in its README in order to satisfy its dependencies,
+and then you can install it to the local maven repository with
+
+	mvn install
+
+###StudentWeb Integration Tools
+
+Once these non-maven-central-repo dependencies have been installed, then it's possible to compile this library with:
 
     mvn clean package
 
