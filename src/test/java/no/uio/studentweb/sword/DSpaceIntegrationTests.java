@@ -480,8 +480,8 @@ public class DSpaceIntegrationTests
         metadata.addField(Metadata.TITLE, "101 days around some of the world");
         metadata.addField(Metadata.TITLE, "101 days in the Pacific", "nob");
         metadata.addField(Metadata.LANGUAGE, "nob");
-        metadata.addField(Metadata.ABSTRACT, "Thor Heyerdahl og fem andre dro fra Peru til Raroia i en selvkonstruert balsafl�te ved navn\n" +
-                "        Kon-Tiki.", "nob");
+        metadata.addField(Metadata.ABSTRACT, "Thor Heyerdahl og fem andre dro fra Peru til Raroia i en selvkonstruert balsaflte ved navn\n" +
+                "        Kon-Tiki. (with special characters: 有期)", "nob");
         metadata.addField(Metadata.ABSTRACT, "In the Kon-Tiki Expedition, Heyerdahl and five fellow adventurers went to Peru, where\n" +
                 "        they constructed a pae-pae raft from balsa wood and other native materials, a raft that\n" +
                 "        they called the Kon-Tiki.");
