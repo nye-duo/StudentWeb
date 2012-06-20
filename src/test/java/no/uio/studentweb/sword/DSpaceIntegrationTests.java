@@ -16,11 +16,35 @@ import java.util.List;
 
 public class DSpaceIntegrationTests
 {
+    private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
+    // private String serviceDoc = "https://duo-ds-utv01.uio.no/dspace/swordv2/servicedocument";
+    private AuthCredentials simpleAuth = new AuthCredentials("test", "test");
+    // private AuthCredentials simpleAuth = new AuthCredentials("richard", "duo");
+
+    /*
+    @Test
+    public void scratch()
+            throws Exception
+    {
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        File bagfile = new File("/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip");
+
+        BagIt bi = new BagIt(bagfile);
+
+        Depositor depositor = new Depositor();
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
+        System.out.println(receipt.getLocation());
+    }
+    */
+
     @Test
     public void create()
             throws Exception
     {
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -60,7 +84,7 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
@@ -71,7 +95,7 @@ public class DSpaceIntegrationTests
             throws Exception
     {
         // first we have to do a create just as in the previous test
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -111,7 +135,7 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
@@ -148,7 +172,7 @@ public class DSpaceIntegrationTests
 
         update.writeToFile();
 
-        SwordResponse response = depositor.update(location, new AuthCredentials("test", "test"), update);
+        SwordResponse response = depositor.update(location, this.simpleAuth, update);
         System.out.println(response.getLocation());
 
         out.delete();
@@ -160,7 +184,7 @@ public class DSpaceIntegrationTests
     {
         // first create an item to be deleted
 
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -200,14 +224,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now delete it
 
-        SwordResponse response = depositor.delete(receipt.getLocation(), new AuthCredentials("test", "test"));
+        SwordResponse response = depositor.delete(receipt.getLocation(), this.simpleAuth);
     }
 
     @Test
@@ -216,7 +240,7 @@ public class DSpaceIntegrationTests
     {
         // first create an item to add the grade to
 
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -256,14 +280,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now set the grade
 
-        SwordResponse response = depositor.setGradeWithPermanentEmbargo(receipt.getLocation(), new AuthCredentials("test", "test"), "pass");
+        SwordResponse response = depositor.setGradeWithPermanentEmbargo(receipt.getLocation(), this.simpleAuth, "pass");
     }
 
     @Test
@@ -272,7 +296,7 @@ public class DSpaceIntegrationTests
     {
         // first create an item to add the grade to
 
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -312,14 +336,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now set the grade with a near embargo
         Date embargo = new Date((new Date()).getTime() + 1000000000L);
-        SwordResponse response = depositor.setGrade(receipt.getLocation(), new AuthCredentials("test", "test"), "pass", embargo, "a while");
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, "pass", embargo, "a while");
     }
 
     @Test
@@ -328,7 +352,7 @@ public class DSpaceIntegrationTests
     {
         // first create an item forfeit the appeal for
 
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -368,14 +392,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now set the grade with a near embargo
         Date embargo = new Date((new Date()).getTime() + 1000000000L);
-        SwordResponse response = depositor.setEmbargo(receipt.getLocation(),  new AuthCredentials("test", "test"), embargo, "embargo");
+        SwordResponse response = depositor.setEmbargo(receipt.getLocation(),  this.simpleAuth, embargo, "embargo");
     }
 
     @Test
@@ -384,7 +408,7 @@ public class DSpaceIntegrationTests
     {
         // first create an item forfeit the appeal for
 
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -424,14 +448,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now set the grade with a near embargo
         Date embargo = new Date((new Date()).getTime() + 1000000000L);
-        SwordResponse response = depositor.setGrade(receipt.getLocation(), new AuthCredentials("test", "test"), "fail", embargo, "a while");
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, "fail", embargo, "a while");
 
         // now forfeit the appeal process
 
@@ -443,7 +467,7 @@ public class DSpaceIntegrationTests
     public void getMetadata()
             throws Exception
     {
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -529,7 +553,7 @@ public class DSpaceIntegrationTests
     public void getFiles()
             throws Exception
     {
-        EndpointDiscovery ed = new EndpointDiscovery("http://localhost:8080/swordv2/servicedocument", null, null, null, new AuthCredentials("test", "test"));
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
         List<SWORDCollection> cols = ed.getEndpoints();
         SWORDCollection col = cols.get(0);
 
@@ -597,14 +621,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now let's go on and test the RepositoryItem features
 
-        RepositoryItem item = new RepositoryItem(receipt.getLocation(), new AuthCredentials("test", "test"));
+        RepositoryItem item = new RepositoryItem(receipt.getLocation(), this.simpleAuth);
         Statement statement = item.getStatement();
         List<ServerResource> files = item.getFiles();
 
