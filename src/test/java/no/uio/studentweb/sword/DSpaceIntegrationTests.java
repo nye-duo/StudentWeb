@@ -16,12 +16,11 @@ import java.util.List;
 
 public class DSpaceIntegrationTests
 {
-    private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
-    // private String serviceDoc = "https://duo-ds-utv01.uio.no/dspace/swordv2/servicedocument";
-    private AuthCredentials simpleAuth = new AuthCredentials("test", "test");
-    // private AuthCredentials simpleAuth = new AuthCredentials("richard", "duo");
+    // private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
+    private String serviceDoc = "https://duo-ds-utv01.uio.no/dspace/swordv2/servicedocument";
+    // private AuthCredentials simpleAuth = new AuthCredentials("test", "test");
+    private AuthCredentials simpleAuth = new AuthCredentials("richard", "duo");
 
-    /*
     @Test
     public void scratch()
             throws Exception
@@ -38,7 +37,6 @@ public class DSpaceIntegrationTests
         DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
     }
-    */
 
     @Test
     public void create()
@@ -505,7 +503,7 @@ public class DSpaceIntegrationTests
         metadata.addField(Metadata.TITLE, "101 days in the Pacific", "nob");
         metadata.addField(Metadata.LANGUAGE, "nob");
         metadata.addField(Metadata.ABSTRACT, "Thor Heyerdahl og fem andre dro fra Peru til Raroia i en selvkonstruert balsaflte ved navn\n" +
-                "        Kon-Tiki. (with special characters: 有期)", "nob");
+                "        Kon-Tiki. (with special characters: 有期 and guest starring å and ø)", "nob");
         metadata.addField(Metadata.ABSTRACT, "In the Kon-Tiki Expedition, Heyerdahl and five fellow adventurers went to Peru, where\n" +
                 "        they constructed a pae-pae raft from balsa wood and other native materials, a raft that\n" +
                 "        they called the Kon-Tiki.");
@@ -535,14 +533,14 @@ public class DSpaceIntegrationTests
         bi.writeToFile();
 
         Depositor depositor = new Depositor();
-        DepositReceipt receipt = depositor.create(col.getHref().toString(), new AuthCredentials("test", "test"), bi);
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
         System.out.println(receipt.getLocation());
 
         out.delete();
 
         // now let's go on and test the RepositoryItem features
 
-        RepositoryItem item = new RepositoryItem(receipt.getLocation(), new AuthCredentials("test", "test"));
+        RepositoryItem item = new RepositoryItem(receipt.getLocation(), this.simpleAuth);
         DepositReceipt entry = item.getEntryDocument();
         Metadata md = item.getMetadata();
 

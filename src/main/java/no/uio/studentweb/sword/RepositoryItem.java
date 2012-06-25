@@ -130,7 +130,7 @@ public class RepositoryItem
 
             // bunch of back-flips to make this actually work ...
             Builder parser = new Builder();
-            Document doc = parser.build(new ByteArrayInputStream(writer.toString().getBytes()));
+            Document doc = parser.build(new ByteArrayInputStream(writer.toString().getBytes("UTF-8")));
             nu.xom.Element root = doc.getRootElement();
             nu.xom.Element clone = (nu.xom.Element) root.copy();
             Metadata metadata = new Metadata(clone);
