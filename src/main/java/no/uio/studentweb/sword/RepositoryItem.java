@@ -34,6 +34,7 @@ import nu.xom.Document;
 import nu.xom.ParsingException;
 import org.apache.abdera.model.Element;
 import org.swordapp.client.AuthCredentials;
+import org.swordapp.client.Content;
 import org.swordapp.client.DepositReceipt;
 import org.swordapp.client.ProtocolViolationException;
 import org.swordapp.client.SWORDClient;
@@ -114,6 +115,19 @@ public class RepositoryItem
         Statement statement = this.getStatement();
         List<ServerResource> resources = statement.getParts();
         return resources;
+    }
+
+    public Content getFile(String url)
+            throws SWORDClientException, SWORDError
+    {
+        try
+        {
+            return this.client.getContent(url, null, null, this.auth);
+        }
+        catch (ProtocolViolationException e)
+        {
+            throw new SWORDClientException(e);
+        }
     }
 
     public Metadata getMetadata()
