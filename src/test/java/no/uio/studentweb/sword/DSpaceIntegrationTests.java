@@ -2,6 +2,7 @@ package no.uio.studentweb.sword;
 
 import no.uio.duo.bagit.BagIt;
 import no.uio.duo.bagit.Metadata;
+import org.apache.abdera.model.Element;
 import org.junit.Test;
 import org.swordapp.client.AuthCredentials;
 import org.swordapp.client.Content;
@@ -12,6 +13,7 @@ import org.swordapp.client.Statement;
 import org.swordapp.client.SwordResponse;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -349,7 +351,32 @@ public class DSpaceIntegrationTests
 
         // now set the grade with a near embargo
         Date embargo = new Date((new Date()).getTime() + 1000000000L);
-        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, "pass", embargo, "a while");
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, "A", embargo, "a while");
+
+        // now let's check that we can retrieve the grade
+        RepositoryItem ri = new RepositoryItem(receipt.getLocation(), this.simpleAuth);
+
+        DepositReceipt nr = ri.getEntryDocument();
+        List<Element> extensions = nr.getEntry().getExtensions();
+
+        Metadata md = ri.getMetadata();
+
+        // check the grade
+        List<String> grades = md.getField(Metadata.GRADE);
+        assert grades.size() == 1;
+        assert grades.get(0).equals("A");
+
+        // check the sent date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String sentDate = sdf.format(embargo);
+        List<String> embargoDate = md.getField(Metadata.EMBARGO_END_DATE);
+        assert embargoDate.size() == 1;
+        assert embargoDate.get(0).equals(sentDate);
+
+        // check the embargo terms
+        List<String> terms = md.getField(Metadata.EMBARGO_TYPE);
+        assert terms.size() == 1;
+        assert terms.get(0).equals("a while");
     }
 
     @Test
