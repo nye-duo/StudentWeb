@@ -19,8 +19,10 @@ import java.util.List;
 
 public class DSpaceIntegrationTests
 {
-    private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
+    // private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
     // private String serviceDoc = "https://duo-ds-utv01.uio.no/dspace/swordv2/servicedocument";
+    private String serviceDoc = "https://duo-utv.uio.no/swordv2/servicedocument";
+
     // private AuthCredentials simpleAuth = new AuthCredentials("test", "test");
     private AuthCredentials simpleAuth = new AuthCredentials("richard", "dspace");
 
@@ -49,7 +51,7 @@ public class DSpaceIntegrationTests
     }
 
     @Test
-    public void create()
+    public void createBag()
             throws Exception
     {
         EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
@@ -85,6 +87,52 @@ public class DSpaceIntegrationTests
         bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
         bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
         bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        System.out.print(out.getAbsolutePath());
+    }
+
+    @Test
+    public void create()
+            throws Exception
+    {
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        String fileBase = bagitCode + "/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+
+        BagIt bi = new BagIt(out);
+
+        bi.addFinalFile(new File(firstFinal), "application/pdf", 1);
+        bi.addFinalFile(new File(secondFinal), "application/pdf" , 2);
+        bi.addFinalFile(new File(thirdFinal), "application/pdf", 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), "application/vnd.oasis.opendocument.text", 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), "application/vnd.oasis.opendocument.text", 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), "application/vnd.oasis.opendocument.text", 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), "application/vnd.oasis.opendocument.text", 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), "application/vnd.oasis.opendocument.text", 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), "application/vnd.oasis.opendocument.text", 3, "closed");
 
         bi.addMetadataFile(new File(metadata));
         bi.addLicenceFile(new File(licence));
@@ -299,7 +347,63 @@ public class DSpaceIntegrationTests
     }
 
     @Test
-    public void setGrade()
+    public void setGradeWithoutEmbargo()
+            throws Exception
+    {
+        // first create an item to add the grade to
+
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        String fileBase = bagitCode + "/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+
+        BagIt bi = new BagIt(out);
+
+        bi.addFinalFile(new File(firstFinal), 1);
+        bi.addFinalFile(new File(secondFinal), 2);
+        bi.addFinalFile(new File(thirdFinal), 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        Depositor depositor = new Depositor();
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
+        System.out.println(receipt.getLocation());
+
+        out.delete();
+
+        // now set the grade, but no embargo
+
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, "pass", null, null);
+    }
+
+    @Test
+    public void setGradeWithEmbargo()
             throws Exception
     {
         // first create an item to add the grade to
@@ -377,6 +481,14 @@ public class DSpaceIntegrationTests
         List<String> terms = md.getField(Metadata.EMBARGO_TYPE);
         assert terms.size() == 1;
         assert terms.get(0).equals("a while");
+
+        /*
+        List<ServerResource> files = ri.getFiles();
+        for (ServerResource sr : files)
+        {
+            Content content = ri.getFile(sr.getUri().toString());
+        }
+        */
     }
 
     @Test
