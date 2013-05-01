@@ -45,8 +45,24 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Class to handle the deposit operations required between StudentWeb and the
+ * repository using SWORDv2.  This is effectively a thin wrapper around the
+ * SWORDv2 client library
+ */
 public class Depositor
 {
+    /**
+     * Create a new item in the repository with the supplied BagIt object
+     *
+     * @param colUri    The SWORDv2 collection URI to deposit to
+     * @param auth      The SWORDv2 authentication credentials
+     * @param bagIt     The BagIt object to deposit
+     * @return  A sword deposit receipt
+     * @throws SWORDClientException
+     * @throws SWORDError
+     * @throws IOException
+     */
 	public DepositReceipt create(String colUri, AuthCredentials auth, BagIt bagIt)
 			throws SWORDClientException, SWORDError, IOException
 	{
@@ -72,6 +88,17 @@ public class Depositor
 		}
 	}
 
+    /**
+     * Update an item which has previously been deposited in the repository
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @param bagIt The BagIt object to deposit
+     * @return  A basit SwordResponse object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     * @throws IOException
+     */
 	public SwordResponse update(String editUri, AuthCredentials auth, BagIt bagIt)
 			throws SWORDClientException, SWORDError, IOException
 	{
@@ -98,6 +125,15 @@ public class Depositor
 		}
 	}
 
+    /**
+     * Delete an existing item from the repository
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @return  A basic SwordResponse object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
 	public SwordResponse delete(String editUri, AuthCredentials auth)
 			throws SWORDClientException, SWORDError
 	{
@@ -113,6 +149,17 @@ public class Depositor
 		}
 	}
 
+    /**
+     * Set an item's grade and permanently embargo it.  This is equivalent to calling {@link #setGrade} with a
+     * an embargo of {@link Constants.EMBARGO_PERMANENT}
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth      The SWORDv2 authentication credentials
+     * @param grade     The grade to set, should be one of {@link Constants.PASS} or {@link Constants.FAIL}
+     * @return  A DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public SwordResponse setGradeWithPermanentEmbargo(String editUri, AuthCredentials auth, String grade)
             throws SWORDClientException, SWORDError
     {
@@ -121,6 +168,18 @@ public class Depositor
         return this.setGrade(editUri, auth, grade, embargoUntil, Constants.EMBARGO_PERMANENT);
     }
 
+    /**
+     * Set an item's grade and embargo period
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @param grade The grade to set, should be one of {@link Constants.PASS} or {@link Constants.FAIL}
+     * @param embargoUntil  The Date to embargo until
+     * @param embargoType   The Embargo type, should be one of the embargo types in {@link Constants}
+     * @return  A DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
 	public SwordResponse setGrade(String editUri, AuthCredentials auth, String grade, Date embargoUntil, String embargoType)
 			throws SWORDClientException, SWORDError
 	{
@@ -146,24 +205,70 @@ public class Depositor
 		}
 	}
 
+    /**
+     * Forfeit the grade appeal for the student.  This is equivalent to calling {@link #setGrade} with the same
+     * arguments, and exists purely for syntactic sugar
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @param grade The grade to set, should be one of {@link Constants.PASS} or {@link Constants.FAIL}
+     * @param embargoUntil  The Date to embargo until
+     * @param embargoType   The Embargo type, should be one of the embargo types in {@link Constants}
+     * @return  return DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public SwordResponse forfeitGradeAppeal(String editUri, AuthCredentials auth, String grade, Date embargoUntil, String embargoType)
             throws SWORDClientException, SWORDError
     {
         return this.setGrade(editUri, auth, grade, embargoUntil, embargoType);
     }
 
+    /**
+     * Forfeit the grade appeal for the student.  This is equivalent to calling {@link #setEmbargo} with the same
+     * arguments, and exists purely for syntactic sugar
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @param embargoUntil  The Date to embargo until
+     * @param embargoType   The Embargo type, should be one of the embargo types in {@link Constants}
+     * @return  return DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
 	public SwordResponse forfeitGradeAppeal(String editUri, AuthCredentials auth, Date embargoUntil, String embargoType)
 			throws SWORDClientException, SWORDError
 	{
 		return this.setEmbargo(editUri, auth, embargoUntil, embargoType);
 	}
 
+    /**
+     * Forfeit the grade appeal for the student.  This is equivalent to calling {@link #setGradeWithPermanentEmbargo} with the same
+     * arguments, and exists purely for syntactic sugar
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @param grade The grade to set, should be one of {@link Constants.PASS} or {@link Constants.FAIL}
+     * @return  return DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public SwordResponse forfeitGradeAppealWithPermanentEmbargo(String editUri, AuthCredentials auth, String grade)
             throws SWORDClientException, SWORDError
     {
         return this.setGradeWithPermanentEmbargo(editUri, auth, grade);
     }
 
+    /**
+     * Forfeit the grade appeal for the student.  This is equivalent to calling {@link #setEmbargo} with these same
+     * arguments and {@link Constants.EMBARGO_PERMANENT}, and thus exists purely for syntactic sugar
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     * @return return DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public SwordResponse forfeitGradeAppealWithPermanentEmbargo(String editUri, AuthCredentials auth)
             throws SWORDClientException, SWORDError
     {
@@ -172,6 +277,17 @@ public class Depositor
         return this.setEmbargo(editUri, auth, embargoUntil, Constants.EMBARGO_PERMANENT);
     }
 
+    /**
+     * Set an embargo on the item
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     *  @param embargoUntil  The Date to embargo until
+     * @param embargoType   The Embargo type, should be one of the embargo types in {@link Constants}
+     * @return  return DepositReceipt object
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public SwordResponse setEmbargo(String editUri, AuthCredentials auth, Date embargoUntil, String embargoType)
     			throws SWORDClientException, SWORDError
     {

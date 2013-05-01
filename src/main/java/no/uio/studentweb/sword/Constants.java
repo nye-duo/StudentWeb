@@ -29,18 +29,36 @@ package no.uio.studentweb.sword;
 
 public class Constants
 {
+    /** Namespace for the StudentWeb/FS metadata */
 	public static String FS_NS = "http://studentweb.no/terms/";
 
+    /** Name of the root element of the FS metadata schema */
     public static String FS_METADATA = "metadata";
+
+    /** The FS metadata element in which the grade is stored */
 	public static String FS_GRADE = "grade";
+
+    /** The FS metadata element in which the embargo end date is stored */
 	public static String FS_EMBARGO_END_DATE = "embargoEndDate";
+
+    /** The FS metadata element in which the embargo type is stored */
 	public static String FS_EMBARGO_TYPE = "embargoType";
 
+    /** String to use to describe a permanent embargo in the FS metadata */
     public static String EMBARGO_PERMANENT = "restricted";
+
+    /** String to use to describe an un-embargoed item in the FS metadata */
     public static String EMBARGO_OPEN = "open";
+
+    /** String to use to describe an item embargoed for 3 years in the FS metadata */
     public static String EMBARGO_3_YEARS = "3 years";
+
+    /** String to use to describe an item that is indefinitely embargoed in the FS metadata */
     public static String EMBARGO_CLOSED = "closed";
 
+    /** String to describe a pass grade in the FS metadata */
     public static String PASS = "pass";
+
+    /** String to describe a fail grade in the FS metadata */
     public static String FAIL = "fail";
 }

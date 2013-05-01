@@ -50,6 +50,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
+/**
+ * Pseudo-entity object representing an item in the Repository.  You can construct it around
+ * an Edit-URI and some authentication credentials, and it will then mediate with the
+ * repository via SWORDv2 to give you the answers to the questions you ask it.
+ */
 public class RepositoryItem
 {
     private SWORDClient client = new SWORDClient();
@@ -59,12 +64,25 @@ public class RepositoryItem
     private DepositReceipt receipt = null;
     private Statement statement = null;
 
+    /**
+     * Construct a RepositoryItem object
+     *
+     * @param editUri   The SWORDv2 Edit-URI of the item, as obtained from the DepositReceipt after the original deposit
+     * @param auth  The SWORDv2 authentication credentials
+     */
     public RepositoryItem(String editUri, AuthCredentials auth)
     {
         this.editUri = editUri;
         this.auth = auth;
     }
 
+    /**
+     * Obtain the DepositReceipt which represents this item in the repository
+     *
+     * @return
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public DepositReceipt getEntryDocument()
             throws SWORDClientException, SWORDError
     {
@@ -90,6 +108,14 @@ public class RepositoryItem
         }
     }
 
+    /**
+     * Retrieve the SWORDv2 Statement which represents this item in the repository
+     *
+     * @return
+     * @throws SWORDClientException
+     * @throws SWORDError
+     * @throws StatementParseException
+     */
     public Statement getStatement()
             throws SWORDClientException, SWORDError, StatementParseException
     {
@@ -109,6 +135,14 @@ public class RepositoryItem
         }
     }
 
+    /**
+     * List all of the files (as ServerResource) objects held by the repository for this item
+     *
+     * @return
+     * @throws SWORDClientException
+     * @throws SWORDError
+     * @throws StatementParseException
+     */
     public List<ServerResource> getFiles()
             throws SWORDClientException, SWORDError, StatementParseException
     {
@@ -117,6 +151,16 @@ public class RepositoryItem
         return resources;
     }
 
+    /**
+     * Get the Content of a specific file as identified by the URL.  The url itself should come
+     * from the ServerResource object or the Statement, as retrieved by the relevant method on
+     * this object
+     *
+     * @param url   URL of the file to retrieve
+     * @return
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public Content getFile(String url)
             throws SWORDClientException, SWORDError
     {
@@ -130,6 +174,13 @@ public class RepositoryItem
         }
     }
 
+    /**
+     * Get a Metadata object representing this item from the repository
+     * 
+     * @return
+     * @throws SWORDClientException
+     * @throws SWORDError
+     */
     public Metadata getMetadata()
             throws SWORDClientException, SWORDError
     {
