@@ -25,9 +25,7 @@ Once downloaded it should be installed into the local maven repository with
 ###BagItLibrary
 
 This library depends on the 1.0 version of the BagItLibrary which implements the custom packaging and unpackaging
-requirements for StudentWeb and Duo.  It can be downloaded from:
-
-https://github.com/nye-duo/BagItLibrary
+requirements for StudentWeb and Duo.  It can be downloaded from [https://github.com/nye-duo/BagItLibrary](https://github.com/nye-duo/BagItLibrary)
 
 You should follow the Build/Install instructions provided in its README in order to satisfy its dependencies,
 and then you can install it to the local maven repository with
@@ -46,10 +44,8 @@ Endpoint Discovery
 
 ###Introduction
 
-The Endpoint Discovery features implement the business logic as laid out in the
-integration requirements, and diagrammed here:
-
-	https://docs.google.com/open?id=0B8W3CmDjW93kM3lZUGNIMGJSektXeXZBSGZpTHM1UQ
+The Endpoint Discovery features implement the business logic as laid out in the functional
+overview: [https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit](https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit#heading=h.cmw4rs85d267)
 
 It also contains features to carry out the following specific tasks:
 
@@ -155,14 +151,12 @@ methods required for StudentWeb to interact with the repository:
 	forfeitGradeAppealWithPermanentEmbargo
 	setEmbargo
 
-These meet the deposit protocol operation requirements as detailed in:
-
-    https://docs.google.com/open?id=0B8W3CmDjW93kLUlmdVpKanBTSlN6ZFo4X0pyemNoUQ
+These meet the deposit protocol operation requirements as detailed in the funtional overview: [https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit](https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit#heading=h.i3etn5tyajkz)
 
 
 ###create
 
-This takes a BagIt object as constructed by the related BagItLibrary and sends it to the
+This takes a BagIt object as constructed by the related [BagItLibrary](https://github.com/nye-duo/BagItLibrary) and sends it to the
 specified deposit endpoint using the AuthCredentials provided.
 
 	public DepositReceipt create(String colUri, AuthCredentials auth, BagIt bagIt)
@@ -170,9 +164,9 @@ specified deposit endpoint using the AuthCredentials provided.
 It sets the parameters of the SWORDv2 deposit as:
 
 	In-Progress: true
-	Content-Disposition; Filename: name of the BagIt file
-	Content-Type: mime of the BagIt file (application/zip)
-	Packaging: packaging of the BagIt file (http://duo.uio.no/terms/package/FSBagIt)
+	Content-Disposition; Filename: {name of the BagIt file}
+	Content-Type: application/zip
+	Packaging: http://duo.uio.no/terms/package/FSBagIt
 
 When the deposit has completed, it will return the DepositReceipt from the underlying sword2-client
 library, or it will throw an appropriate exception
@@ -183,7 +177,7 @@ in the BagIt.
 
 ###update
 
-This takes a BagIt object as constructed by the related BagItLibrary and uses it to replace
+This takes a BagIt object as constructed by the related [BagItLibrary](https://github.com/nye-duo/BagItLibrary) and uses it to replace
 any existing content and metadata in the repository identified by the specified Edit-URI, using
 the AuthCredentials provided
 
@@ -192,9 +186,9 @@ the AuthCredentials provided
 It sets the parameters of the SWORDv2 deposit as:
 
 	Metadata-Relevant: true
-	Content-Disposition; Filename: name of the BagIt file
-	Content-Type: mime of the BagIt file (application/zip)
-	Packaging: packaging of the BagIt file (http://duo.uio.no/terms/package/FSBagIt)
+	Content-Disposition; Filename: {name of the BagIt file}
+	Content-Type: application/zip
+	Packaging: http://duo.uio.no/terms/package/FSBagIt
 
 When the deposit has completed, it will return the SwordResponse object from the underlying sword2-client
 library, or it will throw an appropriate exception
@@ -237,9 +231,7 @@ The embargoType is a free string, but should be provided using one of the consta
     Constants.EMBARGO_CLOSED
 
 The SWORDv2 request that this creates includes an atom:entry document with the grade and embargo details
-encoded as per the metadata schema documented in
-
-	https://docs.google.com/spreadsheet/ccc?key=0Ah-HG8-1YyIldEZmbXFuQWU1bXNWWUJ3N3Fud3hfUlE
+encoded as per the metadata schema documented in the functional overview: [https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit](https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit#heading=h.xgvss9entr7t)
 
 The parameters of the request are:
 
@@ -317,9 +309,7 @@ The embargoType is a free string, but should be provided using one of the consta
     Constants.EMBARGO_CLOSED
 
 The SWORDv2 request that this creates includes an atom:entry document with the embargo details
-encoded as per the metadata schema documented in
-
-	https://docs.google.com/spreadsheet/ccc?key=0Ah-HG8-1YyIldEZmbXFuQWU1bXNWWUJ3N3Fud3hfUlE
+encoded as per the metadata schema documented in the functional overview: [https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit](https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit#heading=h.xgvss9entr7t)
 
 The parameters of the request are:
 
@@ -350,7 +340,7 @@ There are two kinds of information that we want to be able to retrieve from the 
 These are serviced by methods on the RepositoryItem thus:
 
 1. getEntryDocument gets the atom:entry XML document which represents the item in the repository.  Meanwhile,
-	getMetadata will parse the metadata out of the atom:entry document into a BagItLibrary Metadata object such as
+	getMetadata will parse the metadata out of the atom:entry document into a [BagItLibrary](https://github.com/nye-duo/BagItLibrary) Metadata object such as
 	is used when creating the initial deposit.
 
 2. getStatement gets the sword2-client Statement object which represents the item in the repository.  Meanwhile
@@ -390,12 +380,12 @@ The most convenient way to access this metadata is actually to request it direct
 	RepositoryItem item = new RepositoryItem(editUri, authCredentials);
 	Metadata metadata = item.getMetadata()
 
-This provides you with a BagItLibrary Metadata object from which you can access the individual elements of the
+This provides you with a [BagItLibrary](https://github.com/nye-duo/BagItLibrary) Metadata object from which you can access the individual elements of the
 metadata schema, such as:
 
 	List<String> title = metadata.getField(Metadata.TITLE);
 
-See the BagItLibrary documentation for more details.
+See the [BagItLibrary](https://github.com/nye-duo/BagItLibrary) documentation for more details.
 
 
 ###Statement/Files
