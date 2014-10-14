@@ -19,18 +19,18 @@ import java.util.List;
 
 public class DSpaceIntegrationTests
 {
-    // private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
+    private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
     // private String serviceDoc = "https://duo-ds-utv01.uio.no/dspace/swordv2/servicedocument";
-    private String serviceDoc = "https://duo-utv.uio.no/swordv2/servicedocument";
+    //private String serviceDoc = "https://duo-utv.uio.no/swordv2/servicedocument";
 
     // private AuthCredentials simpleAuth = new AuthCredentials("test", "test");
     private AuthCredentials simpleAuth = new AuthCredentials("richard", "dspace");
 
-    // private String bagitCode = "/home/richard/Code/External/BagItLibrary";
-    private String bagitCode = "/Users/richard/Code/External/BagItLibrary";
+    private String bagitCode = "/home/richard/Code/External/BagItLibrary";
+    //private String bagitCode = "/Users/richard/Code/External/BagItLibrary";
 
-    // private String depositZip = "/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
-    private String depositZip = "/Users/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
+    private String depositZip = "/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
+    // private String depositZip = "/Users/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
 
 
     @Test
@@ -931,5 +931,117 @@ public class DSpaceIntegrationTests
         // now we try setting the grade again (which ought to work)
         embargo = new Date((new Date()).getTime() + 1000000000L);
         response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, "fail", embargo, "a bit");
+    }
+
+    @Test
+    public void fail()
+            throws Exception
+    {
+        // first create an item to add the grade to
+
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        String fileBase = bagitCode + "/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+
+        BagIt bi = new BagIt(out);
+
+        bi.addFinalFile(new File(firstFinal), 1);
+        bi.addFinalFile(new File(secondFinal), 2);
+        bi.addFinalFile(new File(thirdFinal), 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        Depositor depositor = new Depositor();
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
+        System.out.println(receipt.getLocation());
+
+        out.delete();
+
+        // now set the grade, but no embargo
+
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, Constants.FAIL, null, null);
+    }
+
+    @Test
+    public void pass()
+            throws Exception
+    {
+        // first create an item to add the grade to
+
+        EndpointDiscovery ed = new EndpointDiscovery(this.serviceDoc, null, null, null, this.simpleAuth);
+        List<SWORDCollection> cols = ed.getEndpoints();
+        SWORDCollection col = cols.get(0);
+
+        String fileBase = bagitCode + "/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+
+        BagIt bi = new BagIt(out);
+
+        bi.addFinalFile(new File(firstFinal), 1);
+        bi.addFinalFile(new File(secondFinal), 2);
+        bi.addFinalFile(new File(thirdFinal), 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        Depositor depositor = new Depositor();
+        DepositReceipt receipt = depositor.create(col.getHref().toString(), this.simpleAuth, bi);
+        System.out.println(receipt.getLocation());
+
+        out.delete();
+
+        // now set the grade, but no embargo
+
+        SwordResponse response = depositor.setGrade(receipt.getLocation(), this.simpleAuth, Constants.PASS, null, null);
     }
 }
