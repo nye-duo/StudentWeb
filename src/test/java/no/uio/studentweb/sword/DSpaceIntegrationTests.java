@@ -4,6 +4,7 @@ import no.uio.duo.bagit.BagIt;
 import no.uio.duo.bagit.Metadata;
 import org.apache.abdera.model.Element;
 import org.junit.Test;
+import org.junit.After;
 import org.swordapp.client.AuthCredentials;
 import org.swordapp.client.Content;
 import org.swordapp.client.DepositReceipt;
@@ -19,6 +20,7 @@ import java.util.List;
 
 public class DSpaceIntegrationTests
 {
+
     private String serviceDoc = "http://localhost:8080/swordv2/servicedocument";
     // private String serviceDoc = "https://duo-ds-utv01.uio.no/dspace/swordv2/servicedocument";
     //private String serviceDoc = "https://duo-utv.uio.no/swordv2/servicedocument";
@@ -26,12 +28,22 @@ public class DSpaceIntegrationTests
     // private AuthCredentials simpleAuth = new AuthCredentials("test", "test");
     private AuthCredentials simpleAuth = new AuthCredentials("richard", "dspace");
 
-    private String bagitCode = "/home/richard/Code/External/BagItLibrary";
+    private String bagitCode = "/home/richard/Code/External/Duo-Dev/BagItLibrary";
+    // private String bagitCode = "/home/richard/Code/External/BagItLibrary";
     //private String bagitCode = "/Users/richard/Code/External/BagItLibrary";
 
-    private String depositZip = "/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
+    //private String depositZip = "/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
     // private String depositZip = "/Users/richard/Dropbox/Documents/DUO/deposit/deposit.zip";
+    private String depositZip = "/home/richard/Code/External/Duo-Dev/BagItLibrary/src/test/resources/testbags/deposit.zip";
 
+    @After
+    public void tearDown()
+    {
+        File out = new File(System.getProperty("user.dir") + File.separator + "deposit.zip");
+        if (out.exists()) {
+            out.delete();
+        }
+    }
 
     @Test
     public void scratch()
