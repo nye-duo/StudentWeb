@@ -24,7 +24,7 @@ Once downloaded it should be installed into the local maven repository with
 
 ###BagItLibrary
 
-This library depends on the 1.0 version of the BagItLibrary which implements the custom packaging and unpackaging
+This library depends on the 2.0 version of the BagItLibrary which implements the custom packaging and unpackaging
 requirements for StudentWeb and Duo.  It can be downloaded from [https://github.com/nye-duo/BagItLibrary](https://github.com/nye-duo/BagItLibrary)
 
 You should follow the Build/Install instructions provided in its README in order to satisfy its dependencies,
